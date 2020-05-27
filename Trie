@@ -1,0 +1,136 @@
+package Trie;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+public class Trie {
+private class Node{
+	char data;
+	HashMap<Character,Node> children;
+	boolean isTerminal;
+	Node(char data,boolean isTerminal){
+		this.children=new HashMap<>();
+		this.data=data;
+		this.isTerminal=isTerminal;
+	}
+	
+}
+private int numWord;
+private Node root;
+Trie(){
+	this.root=new Node('\0',false);
+	this.numWord=0;
+	
+}
+public int numWord() {
+	return this.numWord;
+}
+public void addWord(String word) {
+	this.addWord(this.root,word);
+}
+private void addWord(Node parent,String word) {
+	if(word.length()==0) {
+		if(parent.isTerminal) {
+			//word allready exist
+		}else {
+			parent.isTerminal=true;
+			this.numWord++;
+		}
+		return;
+	}
+	char cc=word.charAt(0);
+	String ros=word.substring(1);
+	Node child=parent.children.get(cc);
+	if(child==null) {
+		child=new Node(cc,false);
+		parent.children.put(cc,child);
+	}
+	this.addWord(child, ros);
+}
+public void display() {
+	this.display(this.root,"");
+}
+private void display(Node node,String osf) {
+	if(node.isTerminal) {
+		String todisplay=osf.substring(1)+node.data;
+		System.out.println(todisplay);
+	}
+	Set<Map.Entry<Character,Node>>entries=node.children.entrySet();
+	for(Map.Entry<Character, Node> entry:entries) {
+	    this.display(entry.getValue(), osf+node.data);
+	}
+}
+public boolean search(String word) {
+	return this.search(this.root,word);
+}
+private boolean search(Node parent,String word) {
+	if(word.length()==0) {
+	if(parent.isTerminal) {
+		return true;
+	}else {
+		return false;
+	}
+	}
+	char cc=word.charAt(0);
+	String ros=word.substring(1);
+	Node child=parent.children.get(cc);
+	if(child==null) {
+		return false;
+	}
+	return this.search(child,ros);
+}
+public void remove(String word) {
+	this.remove(this.root,word);
+}
+private void remove(Node parent,String word) {
+	if(word.length()==0) {
+		if(parent.isTerminal) {
+			parent.isTerminal=false;
+			return;
+		}else {
+			return ;
+		}
+	}
+	char cc=word.charAt(0);
+	String ros=word.substring(1);
+	Node child=parent.children.get(cc);
+	if(child==null) {
+		return;
+	}
+	this.remove(child,ros);
+	if(!child.isTerminal && child.children.size()==0) {
+		parent.children.remove(cc);
+	}
+}
+public void dictionarySearch(String str) {
+	if(!this.dictionarySearch(this.root.children.get(str.charAt(0)),str.substring(1),"",false)) {
+		System.out.println("No suggestions");
+		this.addWord(str);
+	}
+}
+private boolean dictionarySearch(Node node, String str,String ans,boolean flag) {
+	if(node==null)
+		return flag ;
+	
+	if(str.length()!=0) {
+	char cc=str.charAt(0);
+	String ros=str.substring(1);
+	ans=ans+node.data;
+	flag=dictionarySearch(node.children.get(str.charAt(0)),ros,ans,flag);
+	}else {
+		ans=ans+node.data;
+		if(node.isTerminal) {
+			//ans=ans+node.data;
+			System.out.println(ans);
+			flag= true;
+		}
+		for(char n: node.children.keySet()) {
+		flag=dictionarySearch(node.children.get(n),"",ans,flag);
+		}
+		
+	}
+	return flag;
+}
+}
+
